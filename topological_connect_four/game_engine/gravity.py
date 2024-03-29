@@ -1,7 +1,7 @@
 from typing import Callable
 
-from game.board import Board
-from game.models import Player
+from topological_connect_four.game_engine.board import Board
+from topological_connect_four.game_engine.models import Player
 
 ValidationFunction = Callable[[Board, int, int], bool]
 

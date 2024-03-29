@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple
 from abc import ABC, abstractmethod
-from game.models import Player
+from topological_connect_four.game_engine.models import Player
 
 NOT_A_POSITION = None
 AtPosition = Optional[Player]

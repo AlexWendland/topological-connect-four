@@ -1,6 +1,6 @@
-from game.board import Board, NOT_A_POSITION
-from game.models import Player
-from game.gravity import ValidationFunction
+from topological_connect_four.game_engine.board import Board, NOT_A_POSITION
+from topological_connect_four.game_engine.models import Player
+from topological_connect_four.game_engine.gravity import ValidationFunction
 from functools import partial
 
 
