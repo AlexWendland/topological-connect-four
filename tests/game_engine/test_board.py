@@ -1,4 +1,9 @@
-from topological_connect_four.game_engine.board import NoGeometryBoard, NOT_A_POSITION
+from topological_connect_four.game_engine.board import (
+    NoGeometryBoard,
+    ToricBoard,
+    BandBoard,
+    NOT_A_POSITION,
+)
 from topological_connect_four.game_engine.models import Player
 
 import pytest
@@ -15,12 +20,34 @@ def test_initilisation(size: int):
 
 
 @pytest.fixture
-def no_geometry_board():
+def test_baord():
     board = NoGeometryBoard(size=5)
     board.set_position(0, 0, Player.ONE)
     board.set_position(0, 1, Player.TWO)
     board.set_position(2, 0, Player.ONE)
     return board
+
+
+@pytest.mark.parametrize(
+    ["column", "row", "expected"],
+    [
+        (0, 0, (0, 0)),
+        (4, 4, (4, 4)),
+        (-1, 0, NOT_A_POSITION),
+        (0, -1, NOT_A_POSITION),
+        (5, 0, NOT_A_POSITION),
+        (0, 5, NOT_A_POSITION),
+        (7, -2, NOT_A_POSITION),
+    ],
+)
+def test_no_geometry_get_coordinates(test_baord, column, row, expected):
+    assert test_baord._get_coordinates(column, row) == expected
+
+
+@pytest.mark.parametrize(["column", "row"], [(-1, 0), (0, -1), (5, 0), (0, 5), (7, -2)])
+def test_normalise_coordinates(test_baord, column, row):
+    with pytest.raises(ValueError):
+        test_baord.normalise_coordinates(column, row)
 
 
 @pytest.mark.parametrize(
@@ -32,5 +59,45 @@ def no_geometry_board():
         (-1, -1, NOT_A_POSITION),
     ],
 )
-def test_get_position(no_geometry_board, column, row, player):
-    assert no_geometry_board.get_position(column, row) == player
+def test_get_position(test_baord, column, row, player):
+    assert test_baord.get_position(column, row) == player
+
+
+@pytest.mark.parametrize(["column", "row"], [(0, 0), (0, 1), (2, 0)])
+def test_set_coodinate_safe_fails(test_baord, column, row):
+    with pytest.raises(ValueError):
+        test_baord.set_position_safe(column, row, Player.FOUR)
+
+
+@pytest.mark.parametrize(
+    ["column", "row", "expected"],
+    [
+        (0, 0, (0, 0)),
+        (4, 4, (4, 4)),
+        (-1, 0, (4, 0)),
+        (0, -1, NOT_A_POSITION),
+        (5, 0, (0, 0)),
+        (0, 5, NOT_A_POSITION),
+        (7, -2, NOT_A_POSITION),
+    ],
+)
+def test_band_board_get_coordinates(column, row, expected):
+    board = BandBoard(size=5)
+    assert board._get_coordinates(column, row) == expected
+
+
+@pytest.mark.parametrize(
+    ["column", "row", "expected"],
+    [
+        (0, 0, (0, 0)),
+        (4, 4, (4, 4)),
+        (-1, 0, (4, 0)),
+        (0, -1, (0, 4)),
+        (5, 0, (0, 0)),
+        (0, 5, (0, 0)),
+        (7, -2, (2, 3)),
+    ],
+)
+def test_toric_get_coordinates(column, row, expected):
+    board = ToricBoard(size=5)
+    assert board._get_coordinates(column, row) == expected
