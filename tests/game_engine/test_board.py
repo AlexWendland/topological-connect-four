@@ -1,12 +1,13 @@
+import pytest
+
+from topological_connect_four.exceptions import GameException
 from topological_connect_four.game_engine.board import (
+    NOT_A_POSITION,
+    BandBoard,
     NoGeometryBoard,
     ToricBoard,
-    BandBoard,
-    NOT_A_POSITION,
 )
 from topological_connect_four.game_engine.models import Player
-
-import pytest
 
 
 @pytest.mark.parametrize("size", [1, 4, 11])
@@ -46,7 +47,7 @@ def test_no_geometry_get_coordinates(test_baord, column, row, expected):
 
 @pytest.mark.parametrize(["column", "row"], [(-1, 0), (0, -1), (5, 0), (0, 5), (7, -2)])
 def test_normalise_coordinates(test_baord, column, row):
-    with pytest.raises(ValueError):
+    with pytest.raises(GameException):
         test_baord.normalise_coordinates(column, row)
 
 
@@ -65,7 +66,7 @@ def test_get_position(test_baord, column, row, player):
 
 @pytest.mark.parametrize(["column", "row"], [(0, 0), (0, 1), (2, 0)])
 def test_set_coodinate_safe_fails(test_baord, column, row):
-    with pytest.raises(ValueError):
+    with pytest.raises(GameException):
         test_baord.set_position_safe(column, row, Player.FOUR)
 
 

@@ -1,5 +1,7 @@
-from typing import List, Optional, Tuple
 from abc import ABC, abstractmethod
+from typing import List, Optional, Tuple
+
+from topological_connect_four.exceptions import GameException
 from topological_connect_four.game_engine.models import Player
 
 NOT_A_POSITION = None
@@ -48,7 +50,7 @@ class Board(ABC):
         formated_column, formated_row = self.normalise_coordinates(column, row)
         if self._state[formated_row][formated_column] != Player.NO_PLAYER:
             other_player = self._state[formated_row][formated_column]
-            raise ValueError(
+            raise GameException(
                 f"Player {other_player} already in position ({column}, {row}) "
                 f"-> ({formated_column},{formated_row})"
             )
@@ -67,36 +69,26 @@ class Board(ABC):
         """
         coordinates = self._get_coordinates(column, row)
         if coordinates is None:
-            raise ValueError(f"Position ({column}, {row}) not on the board")
+            raise GameException(f"Position ({column}, {row}) not on the board")
         return coordinates
 
     def __str__(self) -> str:
         # NOTE: We build the string top to bottom.
-        representation = (
-            " " * 5 + "." + self._edge_identifier["top"] * (self._size * 2 - 1) + ".\n"
-        )
+        representation = " " * 5 + "." + self._edge_identifier["top"] * (self._size * 2 - 1) + ".\n"
 
         index = self._size - 1
         for row in reversed(self._state):
             representation += f" {index:2d}: " + self._edge_identifier["left"]
             representation += " ".join(
-                [
-                    str(player.value) if player != Player.NO_PLAYER else "-"
-                    for player in row
-                ]
+                [str(player.value) if player != Player.NO_PLAYER else "-" for player in row]
             )
             representation += self._edge_identifier["right"] + "\n"
             index -= 1
 
         representation += (
-            " " * 5
-            + "."
-            + self._edge_identifier["bottom"] * (self._size * 2 - 1)
-            + ".\n"
+            " " * 5 + "." + self._edge_identifier["bottom"] * (self._size * 2 - 1) + ".\n"
         )
-        representation += " " * 6 + " ".join(
-            [str(index) for index in range(self._size)]
-        )
+        representation += " " * 6 + " ".join([str(index) for index in range(self._size)])
         return representation
 
 

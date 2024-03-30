@@ -17,6 +17,13 @@ pytest = "^8.1.1"
 ruff = "^0.3.4"
 uvicorn = "^0.29.0"
 pre-commit = "^3.7.0"
+ipython = "^8.22.2"
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["F", "E", "W", "I"]
 
 [build-system]
 requires = ["poetry-core"]

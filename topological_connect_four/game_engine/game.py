@@ -1,18 +1,18 @@
-from topological_connect_four.game_engine.board import Board, NOT_A_POSITION
-from topological_connect_four.game_engine.models import Player
-from topological_connect_four.game_engine.gravity import ValidationFunction
 from functools import partial
 
+from topological_connect_four.exceptions import GameException
+from topological_connect_four.game_engine.board import NOT_A_POSITION, Board
+from topological_connect_four.game_engine.gravity import ValidationFunction
+from topological_connect_four.game_engine.models import Player
 
-def longest_line(
-    board: Board, column: int, row: int, column_delta: int, row_delta: int
-):
+
+def longest_line(board: Board, column: int, row: int, column_delta: int, row_delta: int):
     current_player = board.get_position(column, row)
     if current_player == NOT_A_POSITION or current_player == Player.NO_PLAYER:
-        raise ValueError(f"No player at ({column}, {row}) or not a position")
+        raise GameException(f"No player at ({column}, {row}) or not a position")
     line_length = 1
     current_column = column + column_delta
-    current_row = row + column_delta
+    current_row = row + row_delta
     while line_length < board._size:
         if board.get_position(current_column, current_row) != current_player:
             break
@@ -31,7 +31,6 @@ def longest_line(
 
 
 def has_position_won(board: Board, column: int, row: int, win_length: int = 4):
-    # BUG: Seems to be finishing early.
     return any(
         [
             longest_line(board, column, row, 1, 0) >= win_length,
@@ -43,7 +42,10 @@ def has_position_won(board: Board, column: int, row: int, win_length: int = 4):
 
 
 class Game:
-    def __init__(self, board: Board, gravity: ValidationFunction):
+    def __init__(self, board: Board, gravity: ValidationFunction, number_of_players: int):
+        if number_of_players < 2:
+            raise ValueError(f"You can not have a game with {number_of_players} you need atleast 2")
+        self._number_of_players = number_of_players
         # TODO: Would be good to add a copy function here.
         self._board = board
         self._next_player = Player.ONE
@@ -52,31 +54,24 @@ class Game:
         self.has_position_won = partial(has_position_won, self._board)
 
     def _progress_next_player(self):
-        # TODO: Make this far less manual.
-        if self._next_player == Player.ONE:
-            self._next_player = Player.TWO
-        elif self._next_player == Player.TWO:
-            self._next_player = Player.THREE
-        elif self._next_player == Player.THREE:
-            self._next_player = Player.FOUR
-        elif self._next_player == Player.FOUR:
-            self._next_player = Player.ONE
+        # Player numbers are 1 indexed but modulus is 0 indexed.
+        next_player_number = self._next_player.value % self._number_of_players
+        self._next_player = Player.from_value(next_player_number + 1)
 
     def make_move(self, player: Player, column: int, row: int):
         if self._finished:
-            raise ValueError("The game has finished no legal move")
+            raise GameException("The game has finished no legal move")
         if player != self._next_player:
-            raise ValueError(
+            raise GameException(
                 f"It is not player {player} go, it is curently player {self._next_player}'s go."
             )
         if not self.valid_move(column, row):
-            raise ValueError(f"Move ({row}, {column}) is not valid.")
+            raise GameException(f"Move ({row}, {column}) is not valid.")
         self._board.set_position_safe(column, row, player)
         if self.has_position_won(column, row):
             self._finished = True
-            print(f"Congratulations player {player} has won! The game is now over.")
-            return
-        self._progress_next_player()
+        else:
+            self._progress_next_player()
 
     def __str__(self):
         representation = str(self._board) + "\n --- "

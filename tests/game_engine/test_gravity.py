@@ -1,13 +1,13 @@
+import pytest
+
+from topological_connect_four.game_engine.board import NoGeometryBoard
 from topological_connect_four.game_engine.gravity import (
+    any_side_gravity,
+    bottom_gravity,
     check_direction,
     no_gravity,
-    bottom_gravity,
-    any_side_gravity,
 )
 from topological_connect_four.game_engine.models import Player
-from topological_connect_four.game_engine.board import NoGeometryBoard
-
-import pytest
 
 
 @pytest.fixture

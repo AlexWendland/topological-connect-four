@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from enum import Enum
+
+from pydantic import BaseModel
 
 
 class GravitySetting(Enum):
@@ -9,8 +10,9 @@ class GravitySetting(Enum):
 
 
 class Topology(Enum):
-    NONE = 1
+    NO_GEOMETRY = 1
     TORUS = 2
+    BAND = 3
 
 
 # TODO: Make this less hard coded
@@ -20,6 +22,18 @@ class Player(Enum):
     TWO = 2
     THREE = 3
     FOUR = 4
+    FIVE = 5
+    SIZE = 6
+    SEVEN = 7
+    EIGHT = 8
+
+    @classmethod
+    def from_value(cls, value: int):
+        # TODO: Make this less hacky.
+        for player in cls:
+            if player.value == value:
+                return player
+        raise KeyError(f"Player {value} not avalible")
 
 
 class GameState(BaseModel):
