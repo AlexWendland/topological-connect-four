@@ -74,7 +74,7 @@ class Board(ABC):
 
     def __str__(self) -> str:
         # NOTE: We build the string top to bottom.
-        representation = " " * 5 + "." + self._edge_identifier["top"] * (self._size * 2 - 1) + ".\n"
+        representation = " " * 5 + "+" + self._edge_identifier["top"] * (self._size * 2 - 1) + "+\n"
 
         index = self._size - 1
         for row in reversed(self._state):
@@ -86,7 +86,7 @@ class Board(ABC):
             index -= 1
 
         representation += (
-            " " * 5 + "." + self._edge_identifier["bottom"] * (self._size * 2 - 1) + ".\n"
+            " " * 5 + "+" + self._edge_identifier["bottom"] * (self._size * 2 - 1) + "+\n"
         )
         representation += " " * 6 + " ".join([str(index) for index in range(self._size)])
         return representation

@@ -1,4 +1,5 @@
 from functools import partial
+from typing import List, Tuple
 
 from topological_connect_four.exceptions import GameException
 from topological_connect_four.game_engine.board import NOT_A_POSITION, Board
@@ -73,11 +74,19 @@ class Game:
         else:
             self._progress_next_player()
 
+    def get_avalible_moves(self) -> List[Tuple[int, int]]:
+        moves = []
+        for column in range(self._board.get_size()):
+            for row in range(self._board.get_size()):
+                if self.valid_move(column, row):
+                    moves.append((column, row))
+        return moves
+
     def __str__(self):
-        representation = str(self._board) + "\n --- "
+        representation = str(self._board) + "\n ---\n"
         if self._finished:
-            representation += f"Player {self._next_player} has won!\n"
+            representation += f"Player {self._next_player.value} has won!\n"
         else:
-            representation += f"Next player to move is {self._next_player}.\n"
+            representation += f"Next player to move is {self._next_player.value}.\n"
         representation += " ---"
         return representation
