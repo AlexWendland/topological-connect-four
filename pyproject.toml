@@ -16,6 +16,7 @@ sqlalchemy = "^2.0.29"
 pytest = "^8.1.1"
 ruff = "^0.3.4"
 uvicorn = "^0.29.0"
+pre-commit = "^3.7.0"
 
 [build-system]
 requires = ["poetry-core"]
