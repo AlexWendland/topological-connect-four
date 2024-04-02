@@ -7,28 +7,40 @@ from topological_connect_four.game_engine.gravity import ValidationFunction
 from topological_connect_four.game_engine.models import Player
 
 
-def longest_line(board: Board, column: int, row: int, column_delta: int, row_delta: int):
+def longest_line(board: Board, column: int, row: int, column_delta: int, row_delta: int) -> int:
+    """
+    Helper function to work out the longest line for the player in the inital position.
+
+    This tracks the normalised positions check for looping back on itself. We only allow
+    one position on the board to count for 1 in the line length.
+    """
     current_player = board.get_position(column, row)
     if current_player == NOT_A_POSITION or current_player == Player.NO_PLAYER:
         raise GameException(f"No player at ({column}, {row}) or not a position")
-    line_length = 1
-    current_column = column + column_delta
-    current_row = row + row_delta
-    while line_length < board._size:
-        if board.get_position(current_column, current_row) != current_player:
-            break
-        line_length += 1
+    positions = [board.normalise_coordinates(column, row)]
+    current_column, current_row = column, row
+    while True:
         current_column += column_delta
         current_row += row_delta
-    current_column = column - column_delta
-    current_row = row - row_delta
-    while line_length < board._size:
         if board.get_position(current_column, current_row) != current_player:
             break
-        line_length += 1
+        # We need to check the position is correct before normalising coordinates.
+        current_column, current_row = board.normalise_coordinates(current_column, current_row)
+        if (current_column, current_row) in positions:
+            break
+        positions.append((current_column, current_row))
+    current_column, current_row = column, row
+    while True:
         current_column -= column_delta
         current_row -= row_delta
-    return line_length
+        if board.get_position(current_column, current_row) != current_player:
+            break
+        # We need to check the position is correct before normalising coordinates.
+        current_column, current_row = board.normalise_coordinates(current_column, current_row)
+        if (current_column, current_row) in positions:
+            break
+        positions.append((current_column, current_row))
+    return len(positions)
 
 
 def has_position_won(board: Board, column: int, row: int, win_length: int = 4):
