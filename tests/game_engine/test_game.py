@@ -1,8 +1,9 @@
 import pytest
 
 from topological_connect_four.exceptions import GameException
-from topological_connect_four.game_engine.board import BandBoard, Board
-from topological_connect_four.game_engine.game import has_position_won, longest_line
+from topological_connect_four.game_engine.board import BandBoard, Board, NoGeometryBoard
+from topological_connect_four.game_engine.game import Game, has_position_won, longest_line
+from topological_connect_four.game_engine.gravity import no_gravity
 from topological_connect_four.game_engine.models import Player
 
 
@@ -91,3 +92,43 @@ def test_longest_line_fails(
 )
 def test_has_position_won(band_board: BandBoard, column: int, row: int, has_won: bool):
     assert has_position_won(band_board, column, row, win_length=4) == has_won
+
+
+@pytest.fixture
+def simple_game():
+    return Game(board=NoGeometryBoard(size=4), gravity=no_gravity, number_of_players=4)
+
+
+def test_progress_next_player(simple_game):
+    assert simple_game._next_player == Player.ONE
+    simple_game._progress_next_player()
+    assert simple_game._next_player == Player.TWO
+    simple_game._progress_next_player()
+    assert simple_game._next_player == Player.THREE
+    simple_game._progress_next_player()
+    assert simple_game._next_player == Player.FOUR
+    simple_game._progress_next_player()
+    assert simple_game._next_player == Player.ONE
+
+
+def test_make_move_requires_correct_player(simple_game: Game):
+    with pytest.raises(GameException):
+        simple_game.make_move(Player.TWO, 0, 0)
+
+
+def test_game_play(simple_game):
+    positions = {}
+    board_size = simple_game._board._size
+    for column in range(3):
+        for row in range(4):
+            player = Player.from_value(row + 1)
+            simple_game.make_move(player, column, row)
+            positions[(column, row)] = player
+            for check_column in range(board_size):
+                for check_row in range(board_size):
+                    assert simple_game._board.get_position(
+                        check_column, check_row
+                    ) == positions.get((check_column, check_row), Player.NO_PLAYER)
+            assert not simple_game._finished
+    simple_game.make_move(Player.ONE, 3, 0)
+    assert simple_game._finished

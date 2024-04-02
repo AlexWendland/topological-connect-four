@@ -79,7 +79,7 @@ class Game:
                 f"It is not player {player} go, it is curently player {self._next_player}'s go."
             )
         if not self.valid_move(column, row):
-            raise GameException(f"Move ({row}, {column}) is not valid.")
+            raise GameException(f"Move ({column}, {row}) is not valid.")
         self._board.set_position_safe(column, row, player)
         if self.has_position_won(column, row):
             self._finished = True
