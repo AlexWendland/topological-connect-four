@@ -14,9 +14,9 @@ if __name__ == "__main__":
         )
         for index, move in enumerate(moves):
             prompt += f"  {index:2d}: {str(move)}\n"
-        move = input(prompt + "\n > ")
+        player_move = input(prompt + "\n > ")
         try:
-            column, row = moves[int(move)]
+            column, row = moves[int(player_move)]
             my_game.make_move(my_game._next_player, int(column), int(row))
         except (ValueError, IndexError, GameException) as move_error:
             print(move_error)

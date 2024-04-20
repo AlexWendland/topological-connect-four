@@ -7,10 +7,12 @@ class ApiTopology(enum.Enum):
     NONE = "none"
     TORUS = "torus"
 
+
 class ApiGravity(enum.Enum):
     NONE = "none"
     BOTTOM = "bottom"
     EDGE = "edge"
+
 
 class Move(pydantic.BaseModel):
     board_id: int
@@ -19,11 +21,13 @@ class Move(pydantic.BaseModel):
     column: int
     row: int
 
+
 class GameSettings(pydantic.BaseModel):
     board_size: int
     topology: ApiTopology
     gravity: ApiGravity
     players: int
+
 
 class GameState(pydantic.BaseModel):
     board: str

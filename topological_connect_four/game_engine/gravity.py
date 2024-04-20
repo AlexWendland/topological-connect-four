@@ -19,9 +19,7 @@ def check_direction(
 ) -> bool:
     normalised_column += column_delta
     normalised_row += row_delta
-    while (0 <= normalised_column < board._size) and (
-        0 <= normalised_row < board._size
-    ):
+    while (0 <= normalised_column < board._size) and (0 <= normalised_row < board._size):
         if board.get_position(normalised_column, normalised_row) == Player.NO_PLAYER:
             return False
         normalised_column += column_delta
